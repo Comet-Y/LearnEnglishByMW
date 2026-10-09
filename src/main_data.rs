@@ -74,7 +74,7 @@ impl Data{
     }
     pub fn cxs(&self)->Option<String>{
 
-        option_output_vector(self.cxs.clone(),|s|{format!("cognate cross reference:{}",s)},"(div-cxs-output)")
+        option_output_vector(self.cxs.clone(),|s|{format!("{}",s)},"(div-cxs-output)")
     }
 
     pub fn uros(&self)->Option<String>{
