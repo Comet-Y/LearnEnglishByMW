@@ -203,14 +203,14 @@ impl std::fmt::Display for DataSenseToken{
             Self::Dt(vd,bold_sn,lower_sn,parenthese_sn)=>{
                 let verb_dividers=match vd.clone().unwrap_or("none".to_string()).as_str(){
                     "t"=>"&nbsp;transitive&nbsp;",
-                    "i"=>"&nbsp;intransitive&nbsp;",
+                    "i"=>"&nbsp;intransitive",
                     _=>""
                 };
                 let mut sense_number=Vec::new();
                 option_add(bold_sn.clone(),&mut sense_number);
                 option_add(lower_sn.clone(),&mut sense_number);
                 option_add(parenthese_sn.clone(),&mut sense_number);
-                write!(f,"{}{}",verb_dividers,format_sn(&clamp_vector(&sense_number,""),false))
+                write!(f,"{}&nbsp;{}",verb_dividers,format_sn(&clamp_vector(&sense_number,""),false))
             }
         }
     }
