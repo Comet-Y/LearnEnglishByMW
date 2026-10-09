@@ -97,15 +97,15 @@ impl StartTokens{
             Self::It=>italic(&s),
             Self::Sc=>s,//小さい大文字にしたい
             Self::Sup=>format!("<sup>{}</sup>",s),//上つき文字にしたい
-            Self::Gloss=>text_color(&s,(50,50,50,100)),
+            Self::Gloss=>text_color(&s,(200,0,0,100)),
             Self::Parahw=>bold(&s),
-            Self::Phrase=>text_color(&s,(0,50,0,100)),
+            Self::Phrase=>text_color(&s,(200,0,0,100)),
             Self::Qword=>format!("\"{}\"",s),
             Self::Wi=>bold(&s),
-            Self::Dx=>text_color(&s,(100,50,0,100)),
-            Self::Dxdef=>text_color(&s,(50,100,0,100)),
-            Self::Dxety=>text_color(&s,(0,50,100,100)),
-            Self::Ma=>text_color(&s,(0,100,50,100)),
+            Self::Dx=>text_color(&s,(200,0,0,100)),
+            Self::Dxdef=>text_color(&s,(200,100,0,100)),
+            Self::Dxety=>text_color(&s,(200,0,0,100)),
+            Self::Ma=>text_color(&s,(200,0,0,100)),
 
     }
 }
