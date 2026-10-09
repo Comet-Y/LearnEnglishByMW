@@ -90,7 +90,7 @@ impl Data{
     }
 
     pub fn usages(&self)->Option<String>{
-        option_output_vector(self.usages.clone(),|s|{format!("usages:{}",s)},"(div-usages-output)")
+        option_output_vector(self.usages.clone(),|s|{format!("{}&nbsp;:&nbsp;{}",bold("usages:"),s)},"(div-usages-output)")
     }
 
     pub fn syns(&self)->Option<String>{
@@ -98,15 +98,15 @@ impl Data{
     }
 
     pub fn quotes(&self)->Option<String>{
-        option_output_vector(self.quotes.clone(),|s|{format!("Quotes:{}",s)},"(div-quotes-output)<br>")
+        option_output_vector(self.quotes.clone(),|s|{format!("{}&nbsp;:&nbsp;{}",bold("quotes"),s)},"(div-quotes-output)<br>")
     }
 
     pub fn art(&self)->Option<String>{
-        option_output(self.art.clone(),|s|{format!("Artwork:{}",s)})
+        option_output(self.art.clone(),|s|{format!("{}&nbsp;:&nbsp;{}",bold("artwork"),s)})
     }
 
     pub fn table(&self)->Option<String>{
-        option_output(self.table.clone(),|s|{format!("Table:{}",s)})
+        option_output(self.table.clone(),|s|{format!("{}",s)})
     }
 
     pub fn et(&self)->Option<String>{
