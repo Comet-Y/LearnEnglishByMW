@@ -28,10 +28,11 @@ async fn output_word(word:&str,api_key:&str,writer:&mut std::io::BufWriter<std::
     let body=serde_json::from_str::<Vec<main_data::Data>>(body);
     writer.write_all(text_decoration::header(word,1).as_bytes()).unwrap();
     match body{
-        Err(e)=>panic!("{:?}",e),
+        Err(e)=>panic!("Error in {}{:?}",word,e),
         Ok(body)=>{
             for b in body{
                 writer.write_all(&b.all().as_bytes()).unwrap();
+                // writer.write_all("<div style=\"page-break-before:always\"></div>".as_bytes()).unwrap();
             }
         }
     }

@@ -39,13 +39,13 @@ impl Data{
         }
         let mut other_header_data=Vec::new();//functional labelと発音
         option_add_change_last(self.fl.clone(),&mut other_header_data,|s|{italic(s)});
-        option_add_vector_change_last(self.hwi.prs.clone(),&mut other_header_data,|s|{format!("/{}/",s)});
+        option_add_vector_change_last(self.hwi.prs.clone(),&mut other_header_data,format_prs);
 
         format!("{} {}",header(&head_word,2),bold(&clamp_vector(&other_header_data,"(div-head_word-other)&nbsp;")))
     }
 
-    pub fn definition(&self)->String{
-        option_output_vector(self.def.clone(),|s|{format!("{}:<br>{}<br>",bold("definition"),s)},"(div-def-output)").unwrap_or("".to_string())
+    pub fn definition(&self)->Option<String>{
+        option_output_vector(self.def.clone(),|s|{format!("{}:<br>{}<br>",bold("definition"),s)},"(div-def-output)<br>")
     }
 
     pub fn alternative_head_words(&self)->Option<Vec<String>>{
@@ -90,7 +90,7 @@ impl Data{
     }
 
     pub fn usages(&self)->Option<String>{
-        option_output_vector(self.usages.clone(),|s|{format!("{}&nbsp;:&nbsp;{}",bold("usages:"),s)},"(div-usages-output)")
+        option_output_vector(self.usages.clone(),|s|{format!("{}&nbsp;:&nbsp;{}",bold("Usages:"),s)},"(div-usages-output)")
     }
 
     pub fn syns(&self)->Option<String>{
@@ -98,11 +98,11 @@ impl Data{
     }
 
     pub fn quotes(&self)->Option<String>{
-        option_output_vector(self.quotes.clone(),|s|{format!("{}&nbsp;:&nbsp;{}",bold("quotes"),s)},"(div-quotes-output)<br>")
+        option_output_vector(self.quotes.clone(),|s|{format!("{}&nbsp;:&nbsp;{}",bold("Quotes"),s)},"(div-quotes-output)<br>")
     }
 
     pub fn art(&self)->Option<String>{
-        option_output(self.art.clone(),|s|{format!("{}&nbsp;:&nbsp;{}",bold("artwork"),s)})
+        option_output(self.art.clone(),|s|{format!("{}&nbsp;:&nbsp;{}",bold("Artwork"),s)})
     }
 
     pub fn table(&self)->Option<String>{
@@ -135,7 +135,7 @@ impl Data{
         let mut product=Vec::new();
         
         product.push(self.head_word());
-        product.push(self.definition());
+        option_add(self.definition(),&mut product);
         option_add_vector(self.alternative_head_words(),&mut product);
         option_add_vector(self.variants(),&mut product);
         option_add(self.lbs(),&mut product);
@@ -147,11 +147,11 @@ impl Data{
         option_add(self.usages(),&mut product);
         option_add(self.syns(), &mut product);
         option_add(self.quotes(),&mut product);
-        option_add(self.art(),&mut product);
+        // option_add(self.art(),&mut product);
         option_add(self.table(),&mut product);
         option_add(self.et(),&mut product);
         option_add(self.date(),&mut product);
-        option_add(self.shortdef(),&mut product);
+        // option_add(self.shortdef(),&mut product);
         clamp_vector_change(&product,"(div-main)<br>",|s|{format!("{}",s)})
 
     }

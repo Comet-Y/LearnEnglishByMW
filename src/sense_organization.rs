@@ -4,6 +4,7 @@ use crate::tags;
 use itertools::Itertools;
 use crate::token_decode;
 use crate::libs::*;
+use crate::text_decoration::*;
 #[derive(Deserialize, Serialize, PartialEq, Debug, Default, Clone)]
 pub  struct DefObject{//Defの要素。Vec<DefObject>でdefになる
     pub vd:Option<String>,
@@ -13,7 +14,7 @@ pub  struct DefObject{//Defの要素。Vec<DefObject>でdefになる
 impl std::fmt::Display for DefObject{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut def_object=Vec::new();
-        option_add(self.vd.clone(),&mut def_object);
+        option_add_change_last(self.vd.clone(),&mut def_object,|s|{italic(s)});
         option_add_vector(self.sls.clone(),&mut def_object);
         def_object.push(clamp_vector_2d(&self.sseq,"(div-DefObject::Sseq::1<br>)","(div-DefObject::Sseq::2<br>)"));
         write!(f,"{}",clamp_vector(&def_object,"(div-DefObject)<br>"))
@@ -62,12 +63,12 @@ impl std::fmt::Display for Sense{
         option_add_vector(self.et.clone(),&mut sense);
         option_add_vector_change_last(self.ins.clone(),&mut sense,format_ins);
         option_add_vector(self.lbs.clone(),&mut sense);
-        option_add_vector(self.prs.clone(),&mut sense);
+        option_add_vector_change_last(self.prs.clone(),&mut sense,format_prs);
         option_add(self.sdsense.clone(),&mut sense);
         option_add(self.sgram.clone(),&mut sense);
         option_add_vector(self.sls.clone(),&mut sense);
         option_add_vector(self.vrs.clone(),&mut sense);
-        write!(f,"{}",clamp_vector(&sense,"(div-Sense)"))
+        write!(f,"{}",clamp_vector(&sense,"(div-Sense)&nbsp;"))
         
     }
 }
@@ -90,8 +91,8 @@ impl std::fmt::Display for DtObject{
             DtObject::Ca(_,ca)=>write!(f,"{}",ca.to_string()),
             DtObject::Ri(_,ri)=>write!(f,"{}",clamp_vector(&ri,"(div-DtObject::Ri)")),
             DtObject::Snote(_,snote)=>write!(f,"{}",snote.iter().map(ToString::to_string).join("(div-DtObject::Snote)")),
-            DtObject::Uns(_,uns)=>write!(f,"{}",uns.iter().map(|u|{u.iter().map(ToString::to_string).join("(div-DtObject::Uns::1)")}).join("(div-DtObject::Uns::2)")),
-            DtObject::Vis(_,vis)=>write!(f,"{}",format_vis(&vis,"(div-DtObject::Vis)"))
+            DtObject::Uns(_,uns)=>write!(f,"{}",clamp_vector_2d(uns,"(div-DtObject::Uns::1)&nbsp;","(div-DtObject::Uns::2)&nbsp;")),
+            DtObject::Vis(_,vis)=>write!(f,"{}",clamp_vector(&vis,"(div-DtObject::Vis)<br>"))
         }
     }
 }
@@ -117,7 +118,7 @@ impl std::fmt::Display for SdsenseObject{
         option_add_vector(self.et.clone(),&mut sdsense_object);
         option_add_vector_change_last(self.ins.clone(),&mut sdsense_object,format_ins);
         option_add_vector(self.lbs.clone(),&mut sdsense_object);
-        option_add_vector(self.prs.clone(),&mut sdsense_object);
+        option_add_vector_change_last(self.prs.clone(),&mut sdsense_object,format_prs);
         option_add(self.sgram.clone(),&mut sdsense_object);
         option_add_vector(self.sls.clone(),&mut sdsense_object);
         option_add_vector(self.vrs.clone(),&mut sdsense_object);
@@ -144,7 +145,7 @@ impl std::fmt::Display for Sen{
         option_add_vector(self.et.clone(),&mut sen);
         option_add_vector_change_last(self.ins.clone(),&mut sen,format_ins);
         option_add_vector(self.lbs.clone(),&mut sen);
-        option_add_vector(self.prs.clone(),&mut sen);
+        option_add_vector_change_last(self.prs.clone(),&mut sen,format_prs);
         option_add(self.sgram.clone(),&mut sen);
         option_add_vector(self.sls.clone(),&mut sen);
         option_add_vector(self.vrs.clone(),&mut sen);

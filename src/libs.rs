@@ -38,9 +38,11 @@ pub fn format_sn(sn:&str,to_bold:bool)->String{
         }
     }
     if to_bold{
-        bold(&format!("<table style=\"display:inline-table; vertical-align:-6px;border-collapse:collapse;table-layout:fixed;\"><tr><td style=\"width:1em;margin:0;padding:0;\">{}</td><td style=\"width:1em;margin:0;padding:0;\">{}</td><td  style=\"width:1em;margin:0;padding:0;\">{}</td></table>",sn_format.0.unwrap_or(""),sn_format.1.unwrap_or(""),sn_format.2.unwrap_or("")))
+        bold(&format!("<span style=\"display:inline-grid;grid-template-columns:1ch 1ch 1.5ch;column-gap:0;vertical-align:baseline;line-height:inherit;\"><span>{}</span><span>{}</span><span>{}</span></span>",bold(sn_format.0.unwrap_or("")),bold(sn_format.1.unwrap_or("")),bold(sn_format.2.unwrap_or(""))))
     }else{
-    format!("<table style=\"display:inline-table; vertical-align:-6px;border-collapse:collapse;table-layout:fixed;\"><tr><td style=\"width:1em;margin:0;padding:0;\">{}</td><td style=\"width:1em;margin:0;padding:0;\">{}</td><td  style=\"width:1em;margin:0;padding:0;\">{}</td></table>",sn_format.0.unwrap_or(""),sn_format.1.unwrap_or(""),sn_format.2.unwrap_or(""))
+        format!("<span style=\"display:inline-grid;grid-template-columns:1ch 1ch 1.5ch;column-gap:0;vertical-align:baseline;line-height:inherit;\"><span>{}</span><span>{}</span><span>{}</span></span>",sn_format.0.unwrap_or(""),sn_format.1.unwrap_or(""),sn_format.2.unwrap_or(""))
+
+    // format!("<table style=\"display:inline-table; vertical-align:-6px;border-collapse:collapse;table-layout:fixed;\"><tr><td style=\"width:1em;margin:0;padding:0;\">{}</td><td style=\"width:1em;margin:0;padding:0;\">{}</td><td  style=\"width:1em;margin:0;padding:0;\">{}</td></table>",sn_format.0.unwrap_or(""),sn_format.1.unwrap_or(""),sn_format.2.unwrap_or(""))
     }
     // bold(&format!("{}{}{}",sn_format.0.unwrap_or("-"),sn_format.1.unwrap_or(if gone>=1 {"-"}else{"&nbsp;&nbsp;"}),sn_format.2.unwrap_or("&nbsp;&nbsp;&nbsp;&nbsp;")))
 }
@@ -50,6 +52,10 @@ pub fn format_ins(ins:& str)->String{
     }else{
         ins.chars().skip(1).collect::<String>()
     }
+}
+
+pub fn format_prs(prs:&str)->String{
+    format!("/{}/",prs)
 }
 
 pub fn change_last<T,F>(vdata:&mut Vec<T>,f:F)
@@ -109,7 +115,7 @@ pub fn append_em_dash(str:&str)->String{
 
 pub fn clamp_vector<T>(vdata:&Vec<T>,div:&str)->String
 where T:std::fmt::Display{
-    vdata.iter().format(&extract_tag(div)).to_string()
+    token_decode::change_string(&vdata.iter().format(&extract_tag(div)).to_string())
 }
 pub fn clamp_vector_2d<T>(vdata:&Vec<Vec<T>>,div1:&str,div2:&str)->String
     where T:std::fmt::Display{
@@ -124,6 +130,3 @@ where T:std::fmt::Display,
     f(&clamp_vector(&vdata,div))
 }
 
-pub fn format_vis(vis:&Vec<other_structure::VisT>,div:&str)->String{
-    clamp_vector_change(vis,div,|s|{format!("&lt;{}&gt;",s)})
-}

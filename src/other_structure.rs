@@ -63,8 +63,8 @@ impl std::fmt::Display for CxsObject{
         if let Some(cxl)=self.cxl.clone(){
             cxs_object.push(italic(&cxl));
         }
-        cxs_object.push(self.cxtis.iter().format("(div-CxsObject::Cxtis)").to_string());
-        write!(f,"{}",cxs_object.iter().format("(div-CxsObject)"))
+        cxs_object.push(clamp_vector(&self.cxtis,"(div-CxsObject::Cxtis)&nbsp;"));
+        write!(f,"{}",clamp_vector(&cxs_object,"(div-CxsObject)&nbsp;"))
 
     }
 }
@@ -122,9 +122,9 @@ impl std::fmt::Display for VrsObject{
         let mut vrs_object=Vec::new();
         option_add(self.vl.clone(),&mut vrs_object);
         vrs_object.push(self.va.clone());
-        option_add_vector(self.prs.clone(),&mut vrs_object);
+        option_add_vector_change_last(self.prs.clone(),&mut vrs_object,format_prs);
         option_add(self.spl.clone(),&mut vrs_object);
-        write!(f,"{}",token_decode::change_string(&vrs_object.iter().format("(div-VrsObject)").to_string()))
+        write!(f,"{}",clamp_vector(&vrs_object,"(div-VrsObject)&nbsp;"))
     }
 }
 
@@ -137,7 +137,7 @@ pub struct VisT{
 }
 impl std::fmt::Display for VisT{
     fn fmt(&self,f:&mut std::fmt::Formatter<'_>)->Result<(),std::fmt::Error>{
-        write!(f,"{}{}",token_decode::change_string(&self.t),token_decode::change_string(&self.aq.clone().unwrap_or(Aq::default()).to_string()))
+        write!(f,"&lt;{}&gt;&nbsp;{}",&self.t,token_decode::change_string(&self.aq.clone().unwrap_or(Aq::default()).to_string()))
     }
 }
 
@@ -157,7 +157,7 @@ impl std::fmt::Display for Aq{
         }
         option_add(self.source.clone(),&mut aq);
         option_add(self.subsource.clone(),&mut aq);
-        write!(f,"{}",token_decode::change_string(&aq.iter().format("(div-Aq)").to_string()))
+        write!(f,"{}",clamp_vector(&aq,"(div-Aq)&nbsp;"))
     }
 }
 
@@ -199,7 +199,10 @@ pub struct RiRiw{
 
 impl std::fmt::Display for RiRiw{
     fn fmt(&self,f:&mut std::fmt::Formatter<'_>)->Result<(),std::fmt::Error>{
-        write!(f,"{} {}",token_decode::change_string(&self.rie),self.prs.clone().unwrap_or(Vec::new()).iter().format("(div-RiRiw)").to_string())
+        let mut ri_riw=Vec::new();
+        ri_riw.push(self.rie.clone());
+        option_add_vector_change_last(self.prs.clone(),&mut ri_riw,format_prs);
+        write!(f,"{}",clamp_vector(&ri_riw,"(div-RiRiw)"))
     }
 }
 
@@ -214,19 +217,11 @@ pub struct Bnw{
 impl std::fmt::Display for Bnw{
     fn fmt(&self,f: &mut std::fmt::Formatter<'_>)->Result<(),std::fmt::Error>{
         let mut bnw:Vec<String>=Vec::new();
-        if let Some(pname)=self.pname.clone(){
-            bnw.push(format!("first name:{}",pname));
-        }
-        if let Some(sname)=self.sname.clone(){
-            bnw.push(format!("sur name:{}",sname));
-        }
-        if let Some(altname)=self.altname.clone(){
-            bnw.push(format!("alternate name:{}",italic(&altname)));
-        }
-        if let Some(prs)=self.prs.clone(){
-            bnw.push(prs.iter().format(",").to_string());
-        }
-        write!(f,"{}",token_decode::change_string(&bnw.iter().format("(div-Bnw)").to_string()))
+        option_add_change_last(self.pname.clone(),&mut bnw,|s|{format!("first name:{}",s)});
+        option_add_change_last(self.sname.clone(),&mut bnw,|s|{format!("sur name:{}",s)});
+        option_add_change_last(self.altname.clone(),&mut bnw,|s|{format!("alternate name:{}",s)});
+        option_add_vector_change_last(self.prs.clone(),&mut bnw,format_prs);
+        write!(f,"{}",clamp_vector(&bnw,"(div-Bnw)"))
     }
 }
 
@@ -243,7 +238,7 @@ impl std::fmt::Display for Ca{
             ca.push(intro);
         }
         option_add_vector(self.cats.clone(),&mut ca);
-        write!(f,"{}",token_decode::change_string(&ca.join("(div-ca)")))
+        write!(f,"{}",clamp_vector(&ca,"(div-ca)"))
     }
 }
 #[derive(Deserialize, Serialize, PartialEq, Debug, Default, Clone)]
@@ -258,14 +253,9 @@ pub struct CatsObject{//dt
 impl std::fmt::Display for CatsObject{
     fn fmt(&self,f:&mut std::fmt::Formatter<'_>)->Result<(),std::fmt::Error>{
         let mut cats_object:Vec<String>=Vec::new();
-        if let Some(pn)=self.pn.clone(){
-            cats_object.push(format!("({})",pn));
-        }
-
-        if let Some(cat)=self.cat.clone(){
-            cats_object.push(italic(&cat));
-        }
-        write!(f,"{}",token_decode::change_string(&cats_object.join("(div-CatsObject)")))
+        option_add_change_last(self.pn.clone(),&mut cats_object,|s|{format!("({})",s)});
+        option_add(self.psl.clone(),&mut cats_object);
+        write!(f,"{}",clamp_vector(&cats_object,"(div-CatsObject)"))
     }
 }
 
@@ -281,7 +271,7 @@ impl std::fmt::Display for SnoteObject{
     fn fmt(&self,f:&mut std::fmt::Formatter<'_>)->Result<(),std::fmt::Error>{
         match self{
             SnoteObject::T(_,t)=>write!(f,"{}",t),
-            SnoteObject::Vis(_,vis)=>write!(f,"{}",format_vis(vis,"(div-SnoteObject::Vis)")),
+            SnoteObject::Vis(_,vis)=>write!(f,"{}",clamp_vector(vis,"(div-SnoteObject::Vis)<br>")),
             SnoteObject::Ri(_,ri)=>write!(f,"{}",clamp_vector(&ri,"(div-SnoteObject::Ri)"))
         }
         
@@ -299,7 +289,7 @@ impl std::fmt::Display for UnsObject{
     fn fmt(&self,f:&mut std::fmt::Formatter<'_>)->Result<(),std::fmt::Error>{
         match self{
             UnsObject::Text(_,text)=>write!(f,"{}",token_decode::change_string(&text)),
-            UnsObject::Vis(_,vis)=>write!(f,"{}",&format_vis(&vis,"div-UnsObject::Vis")),
+            UnsObject::Vis(_,vis)=>write!(f,"{}",&clamp_vector(&vis,"(div-UnsObject::Vis)<br>")),
             UnsObject::Ri(_,ri)=>write!(f,"{}",&clamp_vector(&ri,"(div-UnsObject::ri)"))
         }
     }
@@ -326,7 +316,7 @@ impl std::fmt::Display for UrosObject{
         option_add_vector(self.utxt.clone(),&mut uros_object);
         option_add_vector(self.ins.clone(),&mut uros_object);
         option_add_vector(self.lbs.clone(),&mut uros_object);
-        option_add_vector(self.prs.clone(),&mut uros_object);
+        option_add_vector_change_last(self.prs.clone(),&mut uros_object,format_prs);
         option_add(self.psl.clone(),&mut uros_object);
         option_add_vector(self.sls.clone(),&mut uros_object);
         option_add_vector(self.vrs.clone(),&mut uros_object);
@@ -343,7 +333,7 @@ pub enum UrosUtxtObject{
 impl std::fmt::Display for UrosUtxtObject{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self{
-            UrosUtxtObject::Vis(_,vis)=>write!(f,"{}",format_vis(vis,"(div-UrosUtxtObject::Vis)")),
+            UrosUtxtObject::Vis(_,vis)=>write!(f,"{}",clamp_vector(vis,"(div-UrosUtxtObject::Vis)<br>")),
             UrosUtxtObject::Uns(_,uns )=>write!(f,"{}",clamp_vector_2d(&uns,"(div-UrosUtxtObject::Uns::1)","(div-UrosUtxtObject::Uns::2)"))
         }
     }
@@ -366,7 +356,7 @@ impl std::fmt::Display for DrosObject{
         dros_object.push(append_em_dash(&bold(&self.drp)));
         option_add_vector(self.et.clone(),&mut dros_object);
         option_add_vector(self.lbs.clone(),&mut dros_object);
-        option_add_vector(self.prs.clone(),&mut dros_object);
+        option_add_vector_change_last(self.prs.clone(),&mut dros_object,format_prs);
         option_add(self.psl.clone(),&mut dros_object);
         option_add_vector(self.sls.clone(),&mut dros_object);
         option_add_vector(self.vrs.clone(),&mut dros_object);
@@ -400,7 +390,7 @@ impl std::fmt::Display for UsagesPtObject{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self{
             Self::Text(_,text)=>write!(f,"{}",text),
-            Self::Vis(_,vis)=>write!(f,"{}",format_vis(vis,"(div-UsagesPtObject::Vis)")),
+            Self::Vis(_,vis)=>write!(f,"{}",clamp_vector(vis,"(div-UsagesPtObject::Vis)<br>")),
             Self::Uarefs(_,uarefs )=>write!(f,"{}",uarefs.to_string())
         }
     }
@@ -443,7 +433,7 @@ impl std::fmt::Display for SynsPtObject{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self{
         Self::Text(_,text)=>write!(f,"{}",text),
-        Self::Vis(_,vis)=>write!(f,"{}",format_vis(vis,"(div-SynsPtObject)"))
+        Self::Vis(_,vis)=>write!(f,"{}",clamp_vector(vis,"(div-SynsPtObject)<br>"))
     }
     }
 
